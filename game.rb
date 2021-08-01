@@ -6,6 +6,9 @@ class Game
     def initialize
         @board = Board.new
         @saved_board = ""
+        @time_start = 0
+        @time_stop = 0
+        @level = 0
     end
 
     def get_pos
@@ -39,6 +42,7 @@ class Game
 
     def set_up_board
         val = get_val
+        @level = val
         board.setup_mines(val)
         board.scan_fringles
     end
@@ -48,7 +52,7 @@ class Game
         board.render
         x = 0
         y = 0
-        while true
+        until board.game_over?
         puts "you can use the Arrow key to move the cursor and r,f,s"
         move = Keypress.pos_control
             case move
@@ -74,22 +78,23 @@ class Game
                 
             when "F"            
                 board.flag([x,y])
-                return board.render
+                 board.render
     
             when "R"
-                return board.reveal([x,y])
-               #return board.render
+                 board.reveal([x,y])
+                board.render
             when "RETURN"
-                return board.reveal([x,y])
-                #return board.render
+                 board.reveal([x,y])
+                 board.render
             when "S"
                 @saved_board = board.to_yaml
-              return board.render
+               board.render
             else
                 puts "you put the wrong key"
             end
 
         end
+        system ('clear')
     end
     #for input from the commmand - currently not use
     def play_turn
@@ -107,13 +112,14 @@ class Game
     
 
     def run
+        @time_start = Time.now
         if saved_board == ""
         set_up_board
         end
-        until board.game_over?
+        #until board.game_over?
             #play_turn
             cursor_play_turn
-        end
+        #end
         
         if board.finish
             puts "You have step on mine, try again"
@@ -121,7 +127,14 @@ class Game
         else
             board.render
             puts "Unbelievable! You are genius"
+            @time_stop = Time.now
+            data = "level:#{@level} time:#{@time_stop-@time_start}"
+            write_record(data)
         end
+    end
+
+    def write_record(data)
+        File.write('record.txt',"#{data}\n" , mode:"a")
     end
 
     def load_saved_game
@@ -186,8 +199,8 @@ class Game
     end
     def parse_axis(num)
         return num if num.between?(0,8)
-        return 0 if num < 0
-        return 8 if num > 8    
+        return 8 if num < 0
+        return 0 if num > 8    
     end
 
     def valid_val?(val)

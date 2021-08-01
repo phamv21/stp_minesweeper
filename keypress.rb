@@ -43,23 +43,7 @@ respond = ''
 respond
 
 end
-def self.decision_control
-    c = Keypress.read_char
-respond = '' 
-    case c
-     when "f"
-    respond = "F"
-    when "r"
-    respond = "R"
-    when "s"
-    respond = "S"
-    when "\e"
-    respond = "ESCAPE"
-    else
-    respond = ''
-    end
-respond
-end
+
 
 # oringal case statement from:
 # http://www.alecjacobson.com/weblog/?p=75

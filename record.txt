@@ -1,0 +1,8 @@
+level:1 time:2.112017
+level:2 time:2.881346
+level:3 time:15.74919
+level:3 time:87.58093
+level:2 time:21.276657
+level:5 time:243.317546
+level:3 time:2.586108
+level:6 time:47.564375
