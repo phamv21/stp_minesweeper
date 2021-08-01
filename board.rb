@@ -1,10 +1,12 @@
 require_relative "tile"
 class Board
-    attr_reader :grid
+    attr_reader :grid , :finish
     def initialize
         @grid = Array.new(9) do
             Array.new(9){Tile.new(false)}
         end
+        @mines_nums = 0
+        @finish = false
     end
 
     def []=(pos,value)
@@ -16,7 +18,7 @@ class Board
         grid[x][y]
     end
 
-    def setup_mine(number)
+    def setup_mines(number)
         count = number
             until count == 0
                 x = rand(0..8)
@@ -26,6 +28,7 @@ class Board
                 count -= 1 
                 end
             end
+            @mines_nums = number
     end
     
 
@@ -35,28 +38,33 @@ class Board
     end
 
     def reveal(pos)
+        if self[pos].mine 
+        puts "boooom"
+        reveal_all_mines
+        @finish = true    
+        else
         self[pos].reveal
         auto_reveal
+        end
+
     end
 
     def render
-        rows.each do |row|
-            puts row.join(" ")
+        puts "   #{(0..8).to_a.join("   ")}"
+        rows.each_with_index do |row,i|
+            puts "#{i} #{row.join(" ")}"
         end
     end
 
-    
-
-    
-
 
     def win?
-        
+        reveal_tile_count == (81 - @mines_nums)
     end
 
-    def lose?
-        
+    def game_over?
+        win?||finish
     end
+
     def valid_pos(pos)
         x,y = pos
         x.between?(0,8)&&y.between?(0,8) 
@@ -86,6 +94,26 @@ class Board
             end
         end
     end
+
+    def reveal_tile_count
+        count = 0
+        (0..8).each do |x|
+            (0..8).each do |y|
+            count += 1 if self[[x,y]].hidden == false
+            end
+        end
+        count
+    end
+    def reveal_all_mines
+       (0..8).each do |x|
+            (0..8).each do |y|
+             if self[[x,y]].mine
+                self[[x,y]].force_reveal
+             end
+            end
+        end 
+    end
+
     def auto_reveal
         (0..8).each do |x|
             (0..8).each do |y|

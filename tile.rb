@@ -31,6 +31,9 @@ class Tile
    def reveal
        flag ? (puts "you should unflag it before reveal") : @hidden = false
    end
+   def force_reveal
+        @hidden = false  
+   end
 
    def clear?
        mine == flag
