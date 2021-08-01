@@ -11,10 +11,10 @@ class Tile
 
     def to_s
         if hidden
-             flag ? "[f]" : "[ ]"
+             flag ? "[F]" : "[ ]"
         else
             if mine
-                "[m]"  
+                "[M]"
             else
                 fringle == 0 ? "[*]" : "[#{fringle}]" 
             end    

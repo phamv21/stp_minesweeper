@@ -76,7 +76,7 @@ class Game
         if board.finish
             puts "You have step on mine, try again"
         else
-            puts "You are genius"
+            puts "Unbelievable! You are genius"
         end
     end
 
