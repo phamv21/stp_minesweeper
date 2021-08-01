@@ -48,6 +48,9 @@ class Board
         end
 
     end
+    def flag(pos)
+        self[pos].change_flag
+    end
 
     def render
         puts "   #{(0..8).to_a.join("   ")}"
@@ -87,7 +90,7 @@ class Board
         self[pos].fringle = 9
         end
     end
-    def scan_fringle
+    def scan_fringles
         (0..8).each do |x|
             (0..8).each do |y|
             set_fringle([x,y])
