@@ -20,6 +20,7 @@ class Game
         @level = val
         board.setup_mines(val)
         board.scan_fringles
+        @time_start = Time.now
     end
     def cursor_play_turn
         pos = [0,0]
@@ -87,7 +88,7 @@ class Game
     
 
     def run
-        @time_start = Time.now
+        
         if saved_board == ""
         set_up_board
         end
