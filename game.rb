@@ -11,35 +11,6 @@ class Game
         @level = 0
     end
 
-    def get_pos
-        pos = nil
-        until pos && valid_pos?(pos)
-            
-            begin
-                puts "Please enter a position on the board (e.g., '3,4')"
-                print "> "
-                pos = parse_pos(gets.chomp)
-                rescue
-                puts "you have entered wrong format of postition. Did you seperate them by , ?"
-                puts ""
-                pos = nil
-            end
-        end
-        pos
-    end
-
-    def get_val
-        val = nil
-        until val && valid_val?(val)
-            puts "please enter number of mines (a positive number less than 81)"
-            print "> :"
-            val = parse_val(gets.chomp) 
-        end
-       val 
-    end
-
-   
-
     def set_up_board
         val = get_val
         @level = val
@@ -53,7 +24,7 @@ class Game
         x = 0
         y = 0
         until board.game_over?
-        puts "you can use the Arrow key to move the cursor and r,f,s"
+        puts "you can use the Arrow key to move the cursor \n and f for flag, r for reveal s for save the current game"
         move = Keypress.pos_control
             case move
             when "UP"
@@ -128,13 +99,30 @@ class Game
             board.render
             puts "Unbelievable! You are genius"
             @time_stop = Time.now
-            data = "level:#{@level} time:#{@time_stop-@time_start}"
-            write_record(data)
+            data = "level:#{@level},time:#{@time_stop-@time_start}"
+            write_record("level:#{@level},#{@time_stop-@time_start}")
+            puts "here is your record:"
+            print data
+            puts ""
+            puts "--------------"
+            puts "here is the leaderboard of your current level:"
+            read_record("level:#{@level}")
         end
     end
 
     def write_record(data)
         File.write('record.txt',"#{data}\n" , mode:"a")
+    end
+    def read_record(curent_level)
+        leaderboard = Hash.new{|h,k| h[k] =[]}
+        levels_times = File.readlines("record.txt").map(&:chomp)
+        levels_times.each do |item|
+            data = item.split(",")
+            level,time = data
+            leaderboard[level] << time.to_f
+        end
+        print leaderboard[curent_level].sort[0..9]
+        puts
     end
 
     def load_saved_game
@@ -184,7 +172,32 @@ class Game
         end
         decision
     end
+     def get_pos
+        pos = nil
+        until pos && valid_pos?(pos)
+            
+            begin
+                puts "Please enter a position on the board (e.g., '3,4')"
+                print "> "
+                pos = parse_pos(gets.chomp)
+                rescue
+                puts "you have entered wrong format of postition. Did you seperate them by , ?"
+                puts ""
+                pos = nil
+            end
+        end
+        pos
+    end
 
+    def get_val
+        val = nil
+        until val && valid_val?(val)
+            puts "please enter number of mines (a positive number less than 81)"
+            print "> :"
+            val = parse_val(gets.chomp) 
+        end
+       val 
+    end
     def parse_pos(string)
         string.split(",").map{|char| Integer(char)}
     end
