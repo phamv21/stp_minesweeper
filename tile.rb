@@ -1,24 +1,37 @@
 require 'colorize'
 class Tile
     attr_reader :mine, :hidden, :flag
-    attr_accessor :fringle
+    attr_accessor :fringle, :highlight
     #value present have boom or not
     def initialize(value)
         @mine = value
         @hidden = true
         @flag = false
         @fringle = 0
+        @highlight = false
     end
 
     def to_s
+        if highlight
         if hidden
-             flag ? "[F]".colorize(:yellow) : "[_]"
-        else
-            if mine
-                "[M]".colorize(:red)
+                 flag ? "[F]".colorize(:background => :yellow) : "[_]".colorize(:background => :green)
             else
-                fringle == 0 ? "[*]".colorize(:green) : "[#{fringle}]".colorize(:blue) 
-            end    
+                if mine
+                    "[M]".colorize(:background => :red)
+                else
+                    fringle == 0 ? "[*]".colorize(:background => :green) : "[#{fringle}]".colorize(:background => :blue) 
+                end    
+            end
+        else
+            if hidden
+                 flag ? "[F]".colorize(:yellow) : "[_]"
+            else
+                if mine
+                    "[M]".colorize(:red)
+                else
+                    fringle == 0 ? "[*]".colorize(:green) : "[#{fringle}]".colorize(:blue) 
+                end    
+            end
         end
          
     end

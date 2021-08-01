@@ -1,7 +1,7 @@
 require 'io/console'
-
+class Keypress
 # Reads keypresses from the user including 2 and 3 escape character sequences.
-def read_char
+def self.read_char
   STDIN.echo = false
   STDIN.raw!
 
@@ -15,6 +15,50 @@ ensure
   STDIN.cooked!
 
   return input
+end
+
+def self.pos_control
+     c = Keypress.read_char
+respond = '' 
+    case c
+     when "\e[A"
+    respond = "UP"
+    when "\e[B"
+    respond = "DOWN"
+    when "\e[C"
+    respond = "RIGHT"
+    when "\e[D"
+    respond = "LEFT"
+     when "\r"
+    respond = "RETURN"
+    when "f"
+    respond = "F"
+    when "r"
+    respond = "R"
+    when "s"
+    respond = "S"
+    else
+    respond = ''
+    end
+respond
+
+end
+def self.decision_control
+    c = Keypress.read_char
+respond = '' 
+    case c
+     when "f"
+    respond = "F"
+    when "r"
+    respond = "R"
+    when "s"
+    respond = "S"
+    when "\e"
+    respond = "ESCAPE"
+    else
+    respond = ''
+    end
+respond
 end
 
 # oringal case statement from:
@@ -56,5 +100,5 @@ def show_single_key
     puts "SOMETHING ELSE: #{c.inspect}"
   end
 end
-
 #show_single_key while(true)
+end

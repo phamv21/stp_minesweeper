@@ -1,4 +1,5 @@
 require_relative 'board'
+require_relative 'keypress'
 require 'yaml'
 class Game 
     attr_reader :board, :saved_board
@@ -41,6 +42,62 @@ class Game
         board.setup_mines(val)
         board.scan_fringles
     end
+    def cursor_play_turn
+        pos = [0,0]
+        board.cursor_highlight(pos)
+        board.render
+        x = 0
+        y = 0
+        while true
+        puts "you can use the Arrow key to move the cursor and r,f,s"
+        move = Keypress.pos_control
+            case move
+            when "UP"
+                x = parse_axis(x-1)
+                board.cursor_highlight([x,y])
+                board.render
+                
+            when "DOWN"
+                x = parse_axis(x+1)
+                board.cursor_highlight([x,y])
+                board.render
+                
+            when "RIGHT"
+                y = parse_axis(y+1)
+                board.cursor_highlight([x,y])
+                board.render
+                
+            when "LEFT"
+                y = parse_axis(y-1)
+                board.cursor_highlight([x,y])
+                board.render
+                
+            when "F"            
+                board.flag([x,y])
+                return board.render
+    
+            when "R"
+                board.reveal([x,y])
+               return board.render
+            when "RETURN"
+                board.reveal([x,y])
+                return board.render
+            when "S"
+                @saved_board = board.to_yaml
+              return board.render
+            else
+                puts "you put the wrong key"
+            end
+
+        end
+    end
+
+    def parse_axis(num)
+        return num if num.between?(0,8)
+        return 0 if num < 0
+        return 8 if num > 8    
+    end
+
 
     def play_turn
         board.render
@@ -61,7 +118,8 @@ class Game
         set_up_board
         end
         until board.game_over?
-            play_turn
+            #play_turn
+            cursor_play_turn
         end
         
         if board.finish

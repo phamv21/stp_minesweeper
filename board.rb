@@ -52,7 +52,17 @@ class Board
         self[pos].change_flag
     end
 
+    def cursor_highlight(pos)
+        (0..8).each do |x|
+            (0..8).each do |y|
+            self[[x,y]].highlight = false
+            end
+        end
+        self[pos].highlight = true  
+    end
+
     def render
+        system ('clear')
         puts "   #{(0..8).to_a.join("   ")}"
         rows.each_with_index do |row,i|
             puts "#{i} #{row.join(" ")}"
