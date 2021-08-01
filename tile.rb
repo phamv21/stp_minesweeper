@@ -1,3 +1,4 @@
+require 'colorize'
 class Tile
     attr_reader :mine, :hidden, :flag
     attr_accessor :fringle
@@ -11,12 +12,12 @@ class Tile
 
     def to_s
         if hidden
-             flag ? "[F]" : "[ ]"
+             flag ? "[F]".colorize(:yellow) : "[_]"
         else
             if mine
-                "[M]"
+                "[M]".colorize(:red)
             else
-                fringle == 0 ? "[*]" : "[#{fringle}]" 
+                fringle == 0 ? "[*]".colorize(:green) : "[#{fringle}]".colorize(:blue) 
             end    
         end
          
