@@ -77,11 +77,11 @@ class Game
                 return board.render
     
             when "R"
-                board.reveal([x,y])
-               return board.render
+                return board.reveal([x,y])
+               #return board.render
             when "RETURN"
-                board.reveal([x,y])
-                return board.render
+                return board.reveal([x,y])
+                #return board.render
             when "S"
                 @saved_board = board.to_yaml
               return board.render
@@ -91,14 +91,7 @@ class Game
 
         end
     end
-
-    def parse_axis(num)
-        return num if num.between?(0,8)
-        return 0 if num < 0
-        return 8 if num > 8    
-    end
-
-
+    #for input from the commmand - currently not use
     def play_turn
         board.render
         pos = get_pos
@@ -190,6 +183,11 @@ class Game
         pos.is_a?(Array)&& pos.length == 2 &&
         pos.all?{|x| x.between?(0,8)}
     
+    end
+    def parse_axis(num)
+        return num if num.between?(0,8)
+        return 0 if num < 0
+        return 8 if num > 8    
     end
 
     def valid_val?(val)
