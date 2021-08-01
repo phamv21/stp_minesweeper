@@ -2,9 +2,10 @@ require_relative 'board'
 require_relative 'keypress'
 require 'yaml'
 class Game 
-    attr_reader :board, :saved_board
-    def initialize
-        @board = Board.new
+    attr_reader :board, :saved_board, :size
+    def initialize(size = get_val("please put yours desire size"))
+        @size = size
+        @board = Board.new(size)
         @saved_board = ""
         @time_start = 0
         @time_stop = 0
@@ -12,7 +13,10 @@ class Game
     end
 
     def set_up_board
-        val = get_val
+        while true
+        val = get_val("please enter number of mines (a positive number less than #{size*size})")
+        break if val < (size*size)
+        end
         @level = val
         board.setup_mines(val)
         board.scan_fringles
@@ -99,14 +103,14 @@ class Game
             board.render
             puts "Unbelievable! You are genius"
             @time_stop = Time.now
-            data = "level:#{@level},time:#{@time_stop-@time_start}"
-            write_record("level:#{@level},#{@time_stop-@time_start}")
-            puts "here is your record:"
+            data = "size:#{@size}-level:#{@level},time:#{@time_stop-@time_start}"
+            write_record("size:#{@size}-level:#{@level},#{@time_stop-@time_start}")
+            puts "Here is your record:"
             print data
             puts ""
             puts "--------------"
-            puts "here is the leaderboard of your current level:"
-            read_record("level:#{@level}")
+            puts "Here is the leaderboard of your current level:"
+            read_record("size:#{@size}-level:#{@level}")
         end
     end
 
@@ -131,24 +135,26 @@ class Game
 
     def try_from_saved_point?
         respond = ""
-        while true
-            puts "do you want to load the saved game? yes or no"
-            print "> "
-            respond = gets.chomp
-            case respond
-            when "yes"
-                load_saved_game
-                system("clear")
-                run
-                break
-            when "no"
-                board.render
-                puts "too hard, I know"
-                break
-            else
-                puts "only yes or no please"
-            end
+        if @saved_board != ""
+            while true
+                puts "do you want to load the saved game? yes or no"
+                print "> "
+                respond = gets.chomp
+                case respond
+                when "yes"
+                    load_saved_game
+                    system("clear")
+                    run
+                    break
+                when "no"
+                    board.render
+                    puts "too hard, I know"
+                    break
+                else
+                    puts "only yes or no please"
+                end
 
+            end
         end
         
     end
@@ -189,10 +195,10 @@ class Game
         pos
     end
 
-    def get_val
+    def get_val(promt)
         val = nil
         until val && valid_val?(val)
-            puts "please enter number of mines (a positive number less than 81)"
+            puts promt
             print "> :"
             val = parse_val(gets.chomp) 
         end
@@ -207,18 +213,17 @@ class Game
 
     def valid_pos?(pos)
         pos.is_a?(Array)&& pos.length == 2 &&
-        pos.all?{|x| x.between?(0,8)}
+        pos.all?{|x| x.between?(0,size-1)}
     
     end
     def parse_axis(num)
-        return num if num.between?(0,8)
-        return 8 if num < 0
-        return 0 if num > 8    
+        return num if num.between?(0,size - 1)
+        return (size - 1) if num < 0
+        return 0 if num > (size - 1)    
     end
 
     def valid_val?(val)
-        val.is_a?(Integer)&&
-        val.between?(1,80)
+        val.is_a?(Integer)
     end
 
 

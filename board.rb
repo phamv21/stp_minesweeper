@@ -1,9 +1,10 @@
 require_relative "tile"
 class Board
-    attr_reader :grid , :finish
-    def initialize
-        @grid = Array.new(9) do
-            Array.new(9){Tile.new(false)}
+    attr_reader :grid , :finish, :size
+    def initialize(size)
+        @size = size
+        @grid = Array.new(size) do
+            Array.new(size){Tile.new(false)}
         end
         @mines_nums = 0
         @finish = false
@@ -21,8 +22,8 @@ class Board
     def setup_mines(number)
         count = number
             until count == 0
-                x = rand(0..8)
-                y = rand(0..8)
+                x = rand(0..size-1)
+                y = rand(0..size-1)
                 if self[[x,y]].mine == false
                 self[[x,y]] = Tile.new(true)
                 count -= 1 
@@ -53,8 +54,8 @@ class Board
     end
 
     def cursor_highlight(pos)
-        (0..8).each do |x|
-            (0..8).each do |y|
+        (0..size-1).each do |x|
+            (0..size-1).each do |y|
             self[[x,y]].highlight = false
             end
         end
@@ -63,15 +64,14 @@ class Board
 
     def render
         system ('clear')
-        puts "   #{(0..8).to_a.join("   ")}"
         rows.each_with_index do |row,i|
-            puts "#{i} #{row.join(" ")}"
+            puts row.join(" ")
         end
     end
 
 
     def win?
-        reveal_tile_count == (81 - @mines_nums)
+        reveal_tile_count == (size*size - @mines_nums)
     end
 
     def game_over?
@@ -80,7 +80,7 @@ class Board
 
     def valid_pos(pos)
         x,y = pos
-        x.between?(0,8)&&y.between?(0,8) 
+        x.between?(0,size-1)&&y.between?(0,size-1) 
     end
 
     def set_fringle(pos)
@@ -101,8 +101,8 @@ class Board
         end
     end
     def scan_fringles
-        (0..8).each do |x|
-            (0..8).each do |y|
+        (0..size-1).each do |x|
+            (0..size-1).each do |y|
             set_fringle([x,y])
             end
         end
@@ -110,16 +110,16 @@ class Board
 
     def reveal_tile_count
         count = 0
-        (0..8).each do |x|
-            (0..8).each do |y|
+        (0..size-1).each do |x|
+            (0..size-1).each do |y|
             count += 1 if self[[x,y]].hidden == false
             end
         end
         count
     end
     def reveal_all_mines
-       (0..8).each do |x|
-            (0..8).each do |y|
+       (0..size-1).each do |x|
+            (0..size-1).each do |y|
              if self[[x,y]].mine
                 self[[x,y]].force_reveal
              end
@@ -128,19 +128,28 @@ class Board
     end
 
     def auto_reveal
-        (0..8).each do |x|
-            (0..8).each do |y|
-                if self[[x,y]].fringle == 0 && self[[x,y]].hidden == false
-                    (x-1..x+1).each do |i|
-                    (y-1..y+1).each do |j|
-                        if valid_pos([i,j])
-                            self[[i,j]].reveal
+        
+        repeat = true
+        while repeat
+            before = reveal_tile_count
+            repeat = false
+            (0..size-1).each do |x|
+                (0..size-1).each do |y|
+                    if self[[x,y]].fringle == 0 && self[[x,y]].hidden == false
+                        (x-1..x+1).each do |i|
+                        (y-1..y+1).each do |j|
+                            if valid_pos([i,j])
+                                self[[i,j]].reveal
+                            end
                         end
                     end
-                end
+                    end
                 end
             end
+            after = reveal_tile_count
+            repeat = true if after > before
         end
+
     end
 
     def rows
