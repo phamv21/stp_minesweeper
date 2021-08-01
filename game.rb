@@ -1,8 +1,10 @@
-require_relative "board"
-class Game
-    attr_reader :board
+require_relative 'board'
+require 'yaml'
+class Game 
+    attr_reader :board, :saved_board
     def initialize
         @board = Board.new
+        @saved_board = ""
     end
 
     def get_pos
@@ -32,23 +34,7 @@ class Game
        val 
     end
 
-    def get_decision
-        decision = ""
-        while true
-            puts "put f for flag, r for reveal"
-            print "> :"
-            decision = gets.chomp
-            case decision
-            when "f" 
-                break
-            when "r"
-                break
-            else
-                puts "you can only put: f or r"
-            end
-        end
-        decision
-    end
+   
 
     def set_up_board
         val = get_val
@@ -62,24 +48,78 @@ class Game
         decision = get_decision
         if decision == "r"
             board.reveal(pos)
-        else
+        elsif decision == "f"
             board.flag(pos)
+        else
+            @saved_board = board.to_yaml
         end
     end
+    
 
     def run
+        if saved_board == ""
         set_up_board
+        end
         until board.game_over?
             play_turn
         end
-        board.render
+        
         if board.finish
             puts "You have step on mine, try again"
+            try_from_saved_point?
         else
+            board.render
             puts "Unbelievable! You are genius"
         end
     end
 
+    def load_saved_game
+        @board = YAML::unsafe_load(saved_board)
+    end
+
+    def try_from_saved_point?
+        respond = ""
+        while true
+            puts "do you want to load the saved game? yes or no"
+            print "> "
+            respond = gets.chomp
+            case respond
+            when "yes"
+                load_saved_game
+                system("clear")
+                run
+                break
+            when "no"
+                board.render
+                puts "too hard, I know"
+                break
+            else
+                puts "only yes or no please"
+            end
+
+        end
+        
+    end
+
+    def get_decision
+        decision = ""
+        while true
+            puts "put f for flag, r for reveal s for save the current game."
+            print "> :"
+            decision = gets.chomp
+            case decision
+            when "f" 
+                break
+            when "r"
+                break
+            when "s"
+                break
+            else 
+                puts "you can only put: f or r or s"
+            end
+        end
+        decision
+    end
 
     def parse_pos(string)
         string.split(",").map{|char| Integer(char)}
@@ -89,8 +129,9 @@ class Game
     end
 
     def valid_pos?(pos)
-        x,y = pos
-        x.between?(0,8)&&y.between?(0,8)
+        pos.is_a?(Array)&& pos.length == 2 &&
+        pos.all?{|x| x.between?(0,8)}
+    
     end
 
     def valid_val?(val)
